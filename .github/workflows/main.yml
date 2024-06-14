@@ -13,6 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Add Droplet SSH Key to Known Hosts
+        run: ssh-keyscan -H 159.89.15.7 >> ~/.ssh/known_hosts
+
+
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.4
         with:
