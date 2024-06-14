@@ -1,4 +1,4 @@
-name: SSH Deploy
+name: Deploy to DigitalOcean
 
 on:
   push:
@@ -8,16 +8,31 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      
-    - name: Setup SSH
-      uses: webfactory/ssh-agent@v0.5.4
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        
-    - name: SSH Command
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@159.89.15.7 "echo Hello from SSH"
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+
+      - name: Setup SSH Known Hosts
+        run: |
+          mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
+          ssh-keyscan -H 159.89.15.7 >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: SSH Command
+        run: |
+          ssh -o StrictHostKeyChecking=no root@159.89.15.7 "
+            cd personal-server &&
+            git pull origin main &&
+            npm install &&
+            pm2 restart all
+          "
+        env:
+          GIT_SSH_COMMAND: ssh -o StrictHostKeyChecking=no
