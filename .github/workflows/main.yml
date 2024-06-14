@@ -1,4 +1,4 @@
-nalname: SSH Deploy
+name: SSH Deploy
 
 on:
   push:
