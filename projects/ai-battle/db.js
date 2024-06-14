@@ -3,20 +3,25 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const connect = () => MongoClient.connect(process.env.MONGO_URL);
+const connect = () => {
+  console.log('Connecting to database:', process.env.MONGO_URL); // Log the MongoDB URL
+  return MongoClient.connect(process.env.MONGO_URL);
+};
 
 const getBattles = async () => {
   try {
     const connection = await connect();
+    console.log('Database connected');
 
     const collection = connection.db('AI-BATTLE').collection('Battles');
     const result = await collection.find({}).toArray();
 
     connection.close();
+    console.log('Database connection closed');
 
     return result;
   } catch (error) {
-    console.error(error);
+    console.error('Error in getBattles:', error); // Log the error
     throw new Error('DB error');
   }
 };
@@ -24,6 +29,7 @@ const getBattles = async () => {
 const startBattle = async () => {
   try {
     const connection = await connect();
+    console.log('Database connected');
 
     const collection = connection.db('AI-BATTLE').collection('Battles');
     const result = await collection.insertOne({
@@ -60,10 +66,11 @@ const startBattle = async () => {
     });
 
     connection.close();
+    console.log('Database connection closed');
 
     return result.insertedId;
   } catch (error) {
-    console.error(error);
+    console.error('Error in startBattle:', error); // Log the error
     throw new Error('DB error');
   }
 };
@@ -81,6 +88,7 @@ const updateBattle = async (
 ) => {
   try {
     const connection = await connect();
+    console.log('Database connected');
 
     const collection = connection.db('AI-BATTLE').collection('Battles');
     await collection.updateOne(
@@ -101,8 +109,9 @@ const updateBattle = async (
     );
 
     connection.close();
+    console.log('Database connection closed');
   } catch (error) {
-    console.error(error);
+    console.error('Error in updateBattle:', error); // Log the error
     throw new Error('DB error');
   }
 };
