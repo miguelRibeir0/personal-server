@@ -23,7 +23,7 @@ jobs:
       - name: SSH Command
         run: |
           ssh -o StrictHostKeyChecking=no root@159.89.15.7 "
-            cd /path/to/your/project &&
+            cd personal-server &&
             git pull origin main &&
             npm install &&
             pm2 restart all
