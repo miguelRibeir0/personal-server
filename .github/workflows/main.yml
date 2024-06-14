@@ -1,4 +1,4 @@
-name: SSH Deploy
+nalname: SSH Deploy
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
     - name: SSH Command
       run: |
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@159.89.15.7 "
-          cd /path/to/your/project &&
+          cd personal-server/ &&
           git pull origin main &&
           npm install &&
           pm2 restart all
