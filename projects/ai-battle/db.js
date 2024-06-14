@@ -3,35 +3,35 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const connect = () => {
-  console.log('Connecting to database:', process.env.MONGO_URL); // Log the MongoDB URL
-  return MongoClient.connect(process.env.MONGO_URL);
+const connect = async () => {
+  try {
+    console.log('Connecting to database:', process.env.MONGO_URL);
+    const client = await MongoClient.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Database connected');
+    return client.db('AI-BATTLE').collection('Battles');
+  } catch (error) {
+    console.error('Error connecting to database:', error);
+    throw new Error('DB connection error');
+  }
 };
 
 const getBattles = async () => {
   try {
-    const connection = await connect();
-    console.log('Database connected');
-
-    const collection = connection.db('AI-BATTLE').collection('Battles');
+    const collection = await connect();
     const result = await collection.find({}).toArray();
-
-    connection.close();
-    console.log('Database connection closed');
-
     return result;
   } catch (error) {
-    console.error('Error in getBattles:', error); // Log the error
-    throw new Error('DB error');
+    console.error('Error fetching battles:', error);
+    throw new Error('DB query error');
   }
 };
 
 const startBattle = async () => {
   try {
-    const connection = await connect();
-    console.log('Database connected');
-
-    const collection = connection.db('AI-BATTLE').collection('Battles');
+    const collection = await connect();
     const result = await collection.insertOne({
       battle_1: {
         model: null,
@@ -64,14 +64,10 @@ const startBattle = async () => {
         },
       },
     });
-
-    connection.close();
-    console.log('Database connection closed');
-
     return result.insertedId;
   } catch (error) {
-    console.error('Error in startBattle:', error); // Log the error
-    throw new Error('DB error');
+    console.error('Error starting new battle:', error);
+    throw new Error('DB insert error');
   }
 };
 
@@ -87,10 +83,7 @@ const updateBattle = async (
   b_answer
 ) => {
   try {
-    const connection = await connect();
-    console.log('Database connected');
-
-    const collection = connection.db('AI-BATTLE').collection('Battles');
+    const collection = await connect();
     await collection.updateOne(
       { _id: new ObjectId(userId) },
       {
@@ -107,12 +100,9 @@ const updateBattle = async (
         },
       }
     );
-
-    connection.close();
-    console.log('Database connection closed');
   } catch (error) {
-    console.error('Error in updateBattle:', error); // Log the error
-    throw new Error('DB error');
+    console.error('Error updating battle:', error);
+    throw new Error('DB update error');
   }
 };
 

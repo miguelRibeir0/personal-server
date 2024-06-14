@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import {
+  startBattle,
+  updateBattle,
+  getBattles,
+} from './projects/ai-battle/db.js';
 
 dotenv.config();
 
@@ -10,29 +15,23 @@ server.use(cors());
 server.use(express.json());
 server.use(express.static('public'));
 
-import {
-  startBattle,
-  updateBattle,
-  getBattles,
-} from './projects/ai-battle/db.js';
-
 server.get('/ai-battles/battles', async (req, res) => {
   try {
     const battles = await getBattles();
     res.json(battles);
   } catch (error) {
-    console.error('Error fetching battles:', error); // Log the error
-    res.status(500).send({ error: 'Server error' });
+    console.error('Error fetching battles:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
 server.post('/ai-battles/battles/new', async (req, res) => {
   try {
-    let id = await startBattle();
+    const id = await startBattle();
     res.json({ id });
   } catch (error) {
-    console.error('Error starting new battle:', error); // Log the error
-    res.status(500).send({ error: 'Server error' });
+    console.error('Error starting new battle:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -51,20 +50,12 @@ server.put('/ai-battles/battles/update', async (req, res) => {
     );
     res.send('Battle updated');
   } catch (error) {
-    console.error('Error updating battle:', error); // Log the error
-    res.status(500).send({ error: 'Server error' });
+    console.error('Error updating battle:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Add global error handlers
-process.on('uncaughtException', (err) => {
-  console.error('There was an uncaught error', err);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-server.listen(4242, () => {
-  console.log('Server is listening on port 4242');
+const port = process.env.PORT || 4242;
+server.listen(port, () => {
+  console.log(`Server is listening on port ${port}`);
 });
