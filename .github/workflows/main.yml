@@ -18,12 +18,17 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
         
+    - name: Setup Git credentials
+      run: |
+        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf "https://github.com/"
+        
     - name: SSH Command
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@159.89.15.7 "
+        ssh -o StrictHostKeyChecking=no root@159.89.15.7 "
           cd personal-server/ &&
           git pull origin main &&
           npm install &&
           pm2 restart all
         "
-
+      env:
+        GIT_SSH_COMMAND: ssh -o StrictHostKeyChecking=no
