@@ -10,7 +10,7 @@ server.use(cors());
 
 server.use(express.json());
 
-server.use(express.static('Public'));
+server.use(express.static('public'));
 
 // AI-BATTLE ⚔️ -------------------------------------------------------------------------------------------------------------------------
 
