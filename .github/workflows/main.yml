@@ -20,12 +20,12 @@ jobs:
         
     - name: Setup Git credentials
       run: |
-        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf "https://github.com/"
+        git config --global url."git@github.com:".insteadOf "https://github.com/"
         
     - name: SSH Command
       run: |
         ssh -o StrictHostKeyChecking=no root@159.89.15.7 "
-          cd personal-server/ &&
+          cd /personal-server/ &&
           git pull origin main &&
           npm install &&
           pm2 restart all
