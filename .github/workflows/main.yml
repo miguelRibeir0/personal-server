@@ -20,4 +20,4 @@ jobs:
         
     - name: SSH Command
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa user@159.89.15.7 "echo Hello from SSH"
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@159.89.15.7 "echo Hello from SSH"
