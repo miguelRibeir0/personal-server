@@ -3,14 +3,18 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const connect = async () => {
-  const client = await MongoClient.connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  const collection = client.db('AI-BATTLE').collection('Battles');
-  return { client, collection }; // Return both client and collection
-};
+async function connect() {
+  const client = new MongoClient(process.env.MONGO_URL);
+  try {
+    await client.connect();
+    const db = client.db('AI-BATTLE');
+    const collection = db.collection('Battles');
+    return { client, collection };
+  } catch (error) {
+    console.error('Connection error:', error);
+    throw error;
+  }
+}
 
 const getBattles = async () => {
   let client;
@@ -33,8 +37,9 @@ const getBattles = async () => {
 const startBattle = async () => {
   let client;
   try {
-    const collection = await connect();
-    client = collection.client;
+    const connection = await connect();
+    client = connection.client;
+    const collection = connection.collection;
 
     const result = await collection.insertOne({
       battle_1: {
@@ -70,7 +75,8 @@ const startBattle = async () => {
     });
     return result.insertedId;
   } catch (error) {
-    throw new Error('DB insert error');
+    console.error('Error details:', error);
+    throw new Error(`DB insert error: ${error.message}`);
   } finally {
     if (client) {
       await client.close();
@@ -91,8 +97,9 @@ const updateBattle = async (
 ) => {
   let client;
   try {
-    const collection = await connect();
-    client = collection.client;
+    const connection = await connect();
+    client = connection.client;
+    const collection = connection.collection; // Correctly access the collection
 
     await collection.updateOne(
       { _id: new ObjectId(userId) },
@@ -111,6 +118,7 @@ const updateBattle = async (
       }
     );
   } catch (error) {
+    console.error('Error details:', error);
     throw new Error('DB update error');
   } finally {
     if (client) {
