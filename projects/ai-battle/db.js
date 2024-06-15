@@ -4,34 +4,38 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const connect = async () => {
-  try {
-    console.log('Connecting to database:', process.env.MONGO_URL);
-    const client = await MongoClient.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('Database connected');
-    return client.db('AI-BATTLE').collection('Battles');
-  } catch (error) {
-    console.error('Error connecting to database:', error);
-    throw new Error('DB connection error');
-  }
+  const client = await MongoClient.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  const collection = client.db('AI-BATTLE').collection('Battles');
+  return { client, collection }; // Return both client and collection
 };
 
 const getBattles = async () => {
+  let client;
   try {
-    const collection = await connect();
+    const connection = await connect();
+    client = connection.client;
+
+    const collection = connection.collection;
     const result = await collection.find({}).toArray();
     return result;
   } catch (error) {
-    console.error('Error fetching battles:', error);
     throw new Error('DB query error');
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 };
 
 const startBattle = async () => {
+  let client;
   try {
     const collection = await connect();
+    client = connection.client;
+
     const result = await collection.insertOne({
       battle_1: {
         model: null,
@@ -66,8 +70,11 @@ const startBattle = async () => {
     });
     return result.insertedId;
   } catch (error) {
-    console.error('Error starting new battle:', error);
     throw new Error('DB insert error');
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 };
 
@@ -82,8 +89,11 @@ const updateBattle = async (
   a_answer,
   b_answer
 ) => {
+  let client;
   try {
     const collection = await connect();
+    client = connection.client;
+
     await collection.updateOne(
       { _id: new ObjectId(userId) },
       {
@@ -101,8 +111,11 @@ const updateBattle = async (
       }
     );
   } catch (error) {
-    console.error('Error updating battle:', error);
     throw new Error('DB update error');
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 };
 
