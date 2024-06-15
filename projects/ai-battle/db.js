@@ -34,7 +34,7 @@ const startBattle = async () => {
   let client;
   try {
     const collection = await connect();
-    client = connection.client;
+    client = collection.client;
 
     const result = await collection.insertOne({
       battle_1: {
@@ -92,7 +92,7 @@ const updateBattle = async (
   let client;
   try {
     const collection = await connect();
-    client = connection.client;
+    client = collection.client;
 
     await collection.updateOne(
       { _id: new ObjectId(userId) },
