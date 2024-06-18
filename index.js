@@ -15,6 +15,8 @@ server.use(cors());
 server.use(express.json());
 server.use(express.static('public'));
 
+// AI-BATTLE ⚔️ --------------------------------------------
+
 server.get('/ai-battles/battles', async (req, res) => {
   try {
     const battles = await getBattles();
@@ -55,7 +57,6 @@ server.put('/ai-battles/battles/update', async (req, res) => {
   }
 });
 
-const port = process.env.PORT || 4242;
-server.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
-});
+// --------------------------------------------------------
+
+server.listen(4242);
