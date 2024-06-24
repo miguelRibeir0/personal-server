@@ -6,6 +6,7 @@ import {
   updateBattle,
   getBattles,
 } from './projects/ai-battle/db.js';
+import { getUsers, newUser } from './projects/.admin/db.js';
 
 dotenv.config();
 
@@ -53,6 +54,30 @@ server.put('/ai-battles/battles/update', async (req, res) => {
     res.send('Battle updated');
   } catch (error) {
     console.error('Error updating battle:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// --------------------------------------------------------
+
+// .admin 🦺 ----------------------------------------------
+
+server.get('/.admin/users', async (req, res) => {
+  try {
+    const users = await getUsers();
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.post('/.admin/users/new', async (req, res) => {
+  try {
+    const id = await newUser(req.body.username, req.body.password);
+    res.json({ id });
+  } catch (error) {
+    console.error('Error creating new user:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
