@@ -1,35 +1,40 @@
-import { MongoClient, ObjectId } from 'mongodb';
+import pkg from 'pg';
+const { Pool } = pkg;
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-async function connect() {
-  const client = new MongoClient(process.env.MONGO_URL);
+const pool = new Pool({
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
+});
+
+const connect = async () => {
   try {
-    await client.connect();
-    const db = client.db('dotAdmin');
-    const collection = db.collection('Users');
-    return { client, collection };
+    const client = await pool.connect();
+    return client;
   } catch (error) {
-    console.error('Connection error:', error);
+    console.error('error:', error);
     throw error;
   }
-}
+};
 
 const getUsers = async () => {
   let client;
   try {
-    const connection = await connect();
-    client = connection.client;
+    client = await connect();
 
-    const collection = connection.collection;
-    const result = await collection.find({}).toArray();
-    return result;
+    const result = await client.query('SELECT * FROM users');
+    return result.rows;
   } catch (error) {
+    console.error('DB query error:', error);
     throw new Error('DB query error');
   } finally {
     if (client) {
-      await client.close();
+      client.release();
     }
   }
 };
@@ -37,21 +42,19 @@ const getUsers = async () => {
 const newUser = async (username, password) => {
   let client;
   try {
-    const connection = await connect();
-    client = connection.client;
-    const collection = connection.collection;
+    client = await connect();
 
-    const result = await collection.insertOne({
-      user: username,
-      password: password,
-    });
-    return result.insertedId;
+    const values = [username, password];
+    const query =
+      'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id';
+    const result = await client.query(query, values);
+
+    return result.rows[0].id;
   } catch (error) {
-    console.error('Error details:', error);
     throw new Error(`DB insert error: ${error.message}`);
   } finally {
     if (client) {
-      await client.close();
+      client.release();
     }
   }
 };
