@@ -6,7 +6,7 @@ import {
   updateBattle,
   getBattles,
 } from './projects/ai-battle/db.js';
-import { getUsers, newUser } from './projects/.admin/db.js';
+import { getUsers, newUser, addProduct } from './projects/.admin/db.js';
 
 dotenv.config();
 
@@ -78,6 +78,21 @@ server.post('/.admin/users/new', async (req, res) => {
     res.json({ id });
   } catch (error) {
     console.error('Error creating new user:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.post('/.admin/products/new', async (req, res) => {
+  try {
+    const id = await addProduct(
+      req.body.productName,
+      req.body.price,
+      req.body.quantity,
+      req.body.productStatus
+    );
+    res.json({ id });
+  } catch (error) {
+    console.error('Error creating new product:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

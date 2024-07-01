@@ -59,4 +59,24 @@ const newUser = async (username, password) => {
   }
 };
 
-export { getUsers, newUser };
+const addProduct = async (productName, price, quantity, productStatus) => {
+  let client;
+  try {
+    client = await connect();
+
+    const values = [productName, price, quantity, productStatus];
+    const query =
+      'INSERT INTO products (name,price,quantity,status) VALUES ($1, $2, $3, $4) RETURNING id';
+    const result = await client.query(query, values);
+
+    return result.rows[0].id;
+  } catch (error) {
+    throw new Error(`DB insert error: ${error.message}`);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
+export { getUsers, newUser, addProduct };
