@@ -85,10 +85,10 @@ server.post('/.admin/users/new', async (req, res) => {
 server.post('/.admin/products/new', async (req, res) => {
   try {
     const id = await addProduct(
-      req.body.productName,
+      req.body.name,
       req.body.price,
       req.body.quantity,
-      req.body.productStatus
+      req.body.status
     );
     res.json({ id });
   } catch (error) {
