@@ -1,11 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import {
-  startBattle,
-  updateBattle,
-  getBattles,
-} from './projects/ai-battle/db.js';
+import { startBattle, getBattles } from './projects/ai-battle/db.js';
 import { getUsers, newUser, addProduct } from './projects/.admin/db.js';
 
 dotenv.config();
@@ -30,20 +26,7 @@ server.get('/ai-battles/battles', async (req, res) => {
 
 server.post('/ai-battles/battles/new', async (req, res) => {
   try {
-    const id = await startBattle();
-    res.json({ id });
-  } catch (error) {
-    console.error('Error starting new battle:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-server.put('/ai-battles/battles/update', async (req, res) => {
-  try {
-    await updateBattle(
-      req.body.userId,
-      req.body.battleCount,
-      req.body.round,
+    const id = await startBattle(
       req.body.modelA,
       req.body.modelB,
       req.body.winner,
@@ -51,12 +34,30 @@ server.put('/ai-battles/battles/update', async (req, res) => {
       req.body.a_answer,
       req.body.b_answer
     );
-    res.send('Battle updated');
+    res.json({ id });
   } catch (error) {
-    console.error('Error updating battle:', error);
+    console.error('Error starting new battle:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+// server.put('/ai-battles/battles/update', async (req, res) => {
+//   try {
+//     await updateBattle(
+//       req.body.userId,
+//       req.body.modelA,
+//       req.body.modelB,
+//       req.body.winner,
+//       req.body.prompt,
+//       req.body.a_answer,
+//       req.body.b_answer
+//     );
+//     res.send('Battle updated');
+//   } catch (error) {
+//     console.error('Error updating battle:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
 
 // --------------------------------------------------------
 

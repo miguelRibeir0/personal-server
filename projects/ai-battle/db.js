@@ -34,7 +34,14 @@ const getBattles = async () => {
   }
 };
 
-const startBattle = async () => {
+const startBattle = async (
+  modelA,
+  modelB,
+  winner,
+  prompt,
+  a_answer,
+  b_answer
+) => {
   let client;
   try {
     const connection = await connect();
@@ -42,36 +49,13 @@ const startBattle = async () => {
     const collection = connection.collection;
 
     const result = await collection.insertOne({
-      battle_1: {
-        model: null,
-        round_1: {
-          model_a: null,
-          model_b: null,
-          winner: null,
-          judge: 'user',
-          prompt: null,
-          model_a_answer: null,
-          model_b_answer: null,
-        },
-        round_2: {
-          model_a: null,
-          model_b: null,
-          winner: null,
-          judge: 'user',
-          prompt: null,
-          model_a_answer: null,
-          model_b_answer: null,
-        },
-        round_3: {
-          model_a: null,
-          model_b: null,
-          winner: null,
-          judge: 'user',
-          prompt: null,
-          model_a_answer: null,
-          model_b_answer: null,
-        },
-      },
+      prompt: prompt,
+      model_a: modelA,
+      model_b: modelB,
+      winner: winner,
+      judge: 'user',
+      model_a_answer: a_answer,
+      model_b_answer: b_answer,
     });
     return result.insertedId;
   } catch (error) {
@@ -84,47 +68,44 @@ const startBattle = async () => {
   }
 };
 
-const updateBattle = async (
-  userId,
-  battleCount,
-  round,
-  modelA,
-  modelB,
-  winner,
-  prompt,
-  a_answer,
-  b_answer
-) => {
-  let client;
-  try {
-    const connection = await connect();
-    client = connection.client;
-    const collection = connection.collection; // Correctly access the collection
+// const updateBattle = async (
+//   userId,
+//   // battleCount,
+//   // round,
+//   modelA,
+//   modelB,
+//   winner,
+//   prompt,
+//   a_answer,
+//   b_answer
+// ) => {
+//   let client;
+//   try {
+//     const connection = await connect();
+//     client = connection.client;
+//     const collection = connection.collection; // Correctly access the collection
 
-    await collection.updateOne(
-      { _id: new ObjectId(userId) },
-      {
-        $set: {
-          [`battle_${battleCount + 1}.model`]: modelA,
-          [`battle_${battleCount + 1}.round_${round + 1}.model_a`]: modelA,
-          [`battle_${battleCount + 1}.round_${round + 1}.model_b`]: modelB,
-          [`battle_${battleCount + 1}.round_${round + 1}.winner`]: winner,
-          [`battle_${battleCount + 1}.round_${round + 1}.prompt`]: prompt,
-          [`battle_${battleCount + 1}.round_${round + 1}.model_a_answer`]:
-            a_answer,
-          [`battle_${battleCount + 1}.round_${round + 1}.model_b_answer`]:
-            b_answer,
-        },
-      }
-    );
-  } catch (error) {
-    console.error('Error details:', error);
-    throw new Error('DB update error');
-  } finally {
-    if (client) {
-      await client.close();
-    }
-  }
-};
+//     await collection.updateOne(
+//       { _id: new ObjectId(userId) },
+//       {
+//         $set: {
+//           prompt: prompt,
+//           model_a: modelA,
+//           model_b: modelB,
+//           winner: winner,
+//           model_a_answer: a_answer,
+//           model_b_answer: b_answer,
+//         },
+//       }
+//     );
+//   } catch (error) {
+//     console.error('Error details:', error);
+//     throw new Error('DB update error');
+//   } finally {
+//     if (client) {
+//       await client.close();
+//     }
+//   }
+// };
 
-export { startBattle, updateBattle, getBattles };
+export { startBattle, getBattles };
