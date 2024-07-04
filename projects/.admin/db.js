@@ -59,14 +59,20 @@ const newUser = async (username, password) => {
   }
 };
 
-const addProduct = async (productName, price, quantity, productStatus) => {
+const addProduct = async (
+  productName,
+  price,
+  quantity,
+  productStatus,
+  date
+) => {
   let client;
   try {
     client = await connect();
 
-    const values = [productName, price, quantity, productStatus];
+    const values = [productName, price, quantity, productStatus, date];
     const query =
-      'INSERT INTO products (name,price,quantity,status) VALUES ($1, $2, $3, $4) RETURNING id';
+      'INSERT INTO products (name,price,quantity,status,date) VALUES ($1, $2, $3, $4, $5) RETURNING id';
     const result = await client.query(query, values);
 
     return result.rows[0].id;
@@ -79,4 +85,21 @@ const addProduct = async (productName, price, quantity, productStatus) => {
   }
 };
 
-export { getUsers, newUser, addProduct };
+const getProducts = async () => {
+  let client;
+  try {
+    client = await connect();
+
+    const result = await client.query('SELECT * FROM products');
+    return result.rows;
+  } catch (error) {
+    console.error('DB query error:', error);
+    throw new Error('DB query error');
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
+export { getUsers, newUser, addProduct, getProducts };

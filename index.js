@@ -2,7 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { startBattle, getBattles } from './projects/ai-battle/db.js';
-import { getUsers, newUser, addProduct } from './projects/.admin/db.js';
+import {
+  getUsers,
+  newUser,
+  addProduct,
+  getProducts,
+} from './projects/.admin/db.js';
 
 dotenv.config();
 
@@ -83,13 +88,24 @@ server.post('/.admin/users/new', async (req, res) => {
   }
 });
 
+server.get('/.admin/products', async (req, res) => {
+  try {
+    const products = await getProducts();
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 server.post('/.admin/products/new', async (req, res) => {
   try {
     const id = await addProduct(
       req.body.name,
       req.body.price,
       req.body.quantity,
-      req.body.status
+      req.body.status,
+      req.body.date
     );
     res.json({ id });
   } catch (error) {
