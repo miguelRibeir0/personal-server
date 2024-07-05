@@ -85,12 +85,14 @@ const addProduct = async (
   }
 };
 
-const getProducts = async () => {
+const getDefaultProducts = async () => {
   let client;
   try {
     client = await connect();
 
-    const result = await client.query('SELECT * FROM products');
+    const result = await client.query(
+      'SELECT * FROM products WHERE is_default = true'
+    );
     return result.rows;
   } catch (error) {
     console.error('DB query error:', error);
@@ -102,4 +104,56 @@ const getProducts = async () => {
   }
 };
 
-export { getUsers, newUser, addProduct, getProducts };
+const insertUserProducts = async (userId, productId) => {
+  let client;
+
+  try {
+    client = await connect();
+    const values = [userId, productId];
+    const query =
+      'INSERT INTO user_products (user_id, product_id) VALUES ($1, $2)';
+    const result = await client.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.error('error:', error);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
+const getUserProducts = async (userId) => {
+  let client;
+  try {
+    if (userId === null || isNaN(parseInt(userId))) {
+      throw new Error('userId can´t be null');
+    }
+
+    client = await connect();
+    const values = [userId];
+    const query = `
+      SELECT products.id, products.name, products.price, products.quantity, products.status, products.date
+      FROM user_products
+      JOIN products ON user_products.product_id = p.id
+      WHERE user_products.user_id = $1
+    `;
+    const result = await client.query(query, values);
+    return result.rows;
+  } catch (error) {
+    console.error('error:', error);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
+export {
+  getUsers,
+  newUser,
+  addProduct,
+  getDefaultProducts,
+  insertUserProducts,
+  getUserProducts,
+};

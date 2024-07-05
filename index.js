@@ -6,7 +6,9 @@ import {
   getUsers,
   newUser,
   addProduct,
-  getProducts,
+  getDefaultProducts,
+  insertUserProducts,
+  getUserProducts,
 } from './projects/.admin/db.js';
 
 dotenv.config();
@@ -90,7 +92,7 @@ server.post('/.admin/users/new', async (req, res) => {
 
 server.get('/.admin/products', async (req, res) => {
   try {
-    const products = await getProducts();
+    const products = await getDefaultProducts();
     res.json(products);
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -110,6 +112,26 @@ server.post('/.admin/products/new', async (req, res) => {
     res.json({ id });
   } catch (error) {
     console.error('Error creating new product:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.post('/.admin/user-products/new', async (req, res) => {
+  try {
+    const id = await insertUserProducts(req.body.userId, req.body.productId);
+    res.json({ id });
+  } catch (error) {
+    console.error('Error creating new product:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.get('/.admin/user-products/:userId', async (req, res) => {
+  try {
+    const products = await getUserProducts(req.params.userId);
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching user products:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
