@@ -135,7 +135,7 @@ const getUserProducts = async (userId) => {
     const query = `
       SELECT products.id, products.name, products.price, products.quantity, products.status, products.date
       FROM user_products
-      JOIN products ON user_products.product_id = p.id
+      JOIN products ON user_products.product_id = products.id
       WHERE user_products.user_id = $1
     `;
     const result = await client.query(query, values);
