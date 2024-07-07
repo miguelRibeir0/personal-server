@@ -149,6 +149,50 @@ const getUserProducts = async (userId) => {
   }
 };
 
+const updateUserProducts = async (
+  productId,
+  pName,
+  pPrice,
+  pQuantity,
+  pStatus
+) => {
+  let client;
+  try {
+    client = await connect();
+    const values = [productId, pName, pPrice, pQuantity, pStatus];
+    const query = `
+      UPDATE products
+      SET name = $2, price = $3, quantity = $4, status = $5
+      WHERE id = $1
+    `;
+    await client.query(query, values);
+    return { Success: 'Product updated' };
+  } catch (error) {
+    console.error('error:', error);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
+const deleteUserProducts = async (productId) => {
+  let client;
+  try {
+    client = await connect();
+    const values = [productId];
+    const query = 'DELETE FROM products WHERE id = $1';
+    await client.query(query, values);
+    return { Success: 'Product deleted' };
+  } catch (error) {
+    console.error('error:', error);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
 export {
   getUsers,
   newUser,
@@ -156,4 +200,6 @@ export {
   getDefaultProducts,
   insertUserProducts,
   getUserProducts,
+  updateUserProducts,
+  deleteUserProducts,
 };

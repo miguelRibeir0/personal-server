@@ -9,6 +9,8 @@ import {
   getDefaultProducts,
   insertUserProducts,
   getUserProducts,
+  updateUserProducts,
+  deleteUserProducts,
 } from './projects/.admin/db.js';
 
 dotenv.config();
@@ -132,6 +134,32 @@ server.get('/.admin/user-products/:userId', async (req, res) => {
     res.json(products);
   } catch (error) {
     console.error('Error fetching user products:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.put('/.admin/products/update', async (req, res) => {
+  try {
+    await updateUserProducts(
+      req.body.productId,
+      req.body.pName,
+      req.body.pPrice,
+      req.body.pQuantity,
+      req.body.pStatus
+    );
+    res.json({ Success: 'Product updated' });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.delete('/.admin/products/delete', async (req, res) => {
+  try {
+    await deleteUserProducts(req.body.productId);
+    res.json({ Success: 'Product deleted' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
