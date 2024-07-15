@@ -39,6 +39,40 @@ const getUsers = async () => {
   }
 };
 
+const getUserInfo = async (id) => {
+  let client;
+  try {
+    client = await connect();
+    const values = [id];
+    const query = 'SELECT * FROM users WHERE id = $1';
+    const result = await client.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.error('error:', error);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
+const updateUserInfo = async (id, username, password) => {
+  let client;
+  try {
+    client = await connect();
+    const values = [id, username, password];
+    const query = 'UPDATE users SET username = $2, password = $3 WHERE id = $1';
+    await client.query(query, values);
+    return { Success: 'User updated' };
+  } catch (error) {
+    console.error('error:', error);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
 const newUser = async (username, password) => {
   let client;
   try {
@@ -202,4 +236,6 @@ export {
   getUserProducts,
   updateUserProducts,
   deleteUserProducts,
+  getUserInfo,
+  updateUserInfo,
 };

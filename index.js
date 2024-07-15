@@ -11,6 +11,8 @@ import {
   getUserProducts,
   updateUserProducts,
   deleteUserProducts,
+  getUserInfo,
+  updateUserInfo,
 } from './projects/.admin/db.js';
 
 dotenv.config();
@@ -81,6 +83,15 @@ server.get('/.admin/users', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+server.get('/.admin/users/:id', async (req, res) => {
+  try {
+    const user = await getUserInfo(req.params.id);
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 server.post('/.admin/users/new', async (req, res) => {
   try {
@@ -88,6 +99,16 @@ server.post('/.admin/users/new', async (req, res) => {
     res.json({ id });
   } catch (error) {
     console.error('Error creating new user:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.put('/.admin/users/update', async (req, res) => {
+  try {
+    await updateUserInfo(req.body.id, req.body.username, req.body.password);
+    res.json({ Success: 'User updated' });
+  } catch (error) {
+    console.error('Error updating user:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
