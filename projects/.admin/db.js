@@ -227,6 +227,23 @@ const deleteUserProducts = async (productId) => {
   }
 };
 
+// VIEW ONLY
+
+const allProducts = async () => {
+  let client;
+  try {
+    client = await connect();
+    const result = await client.query('SELECT * FROM products');
+    return result.rows;
+  } catch (error) {
+    console.error('error:', error);
+  } finally {
+    if (client) {
+      client.release();
+    }
+  }
+};
+
 export {
   getUsers,
   newUser,
@@ -238,4 +255,5 @@ export {
   deleteUserProducts,
   getUserInfo,
   updateUserInfo,
+  allProducts,
 };

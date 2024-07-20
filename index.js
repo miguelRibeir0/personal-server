@@ -13,6 +13,7 @@ import {
   deleteUserProducts,
   getUserInfo,
   updateUserInfo,
+  allProducts,
 } from './projects/.admin/db.js';
 
 dotenv.config();
@@ -181,6 +182,16 @@ server.delete('/.admin/products/delete', async (req, res) => {
     res.json({ Success: 'Product deleted' });
   } catch (error) {
     console.error('Error deleting product:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.get('/.admin/all-products', async (req, res) => {
+  try {
+    const product = await allProducts();
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
