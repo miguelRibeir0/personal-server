@@ -1,20 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { startBattle, getBattles } from './projects/ai-battle/db.js';
-import {
-  getUsers,
-  newUser,
-  addProduct,
-  getDefaultProducts,
-  insertUserProducts,
-  getUserProducts,
-  updateUserProducts,
-  deleteUserProducts,
-  getUserInfo,
-  updateUserInfo,
-  allProducts,
-} from './projects/.admin/db.js';
 
 dotenv.config();
 
@@ -25,6 +11,8 @@ server.use(express.json());
 server.use(express.static('public'));
 
 // AI-BATTLE ⚔️ --------------------------------------------
+
+import { startBattle, getBattles } from './projects/ai-battle/db.js';
 
 server.get('/ai-battles/battles', async (req, res) => {
   try {
@@ -53,27 +41,23 @@ server.post('/ai-battles/battles/new', async (req, res) => {
   }
 });
 
-// server.put('/ai-battles/battles/update', async (req, res) => {
-//   try {
-//     await updateBattle(
-//       req.body.userId,
-//       req.body.modelA,
-//       req.body.modelB,
-//       req.body.winner,
-//       req.body.prompt,
-//       req.body.a_answer,
-//       req.body.b_answer
-//     );
-//     res.send('Battle updated');
-//   } catch (error) {
-//     console.error('Error updating battle:', error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
 // --------------------------------------------------------
 
 // .admin 🦺 ----------------------------------------------
+
+import {
+  getUsers,
+  newUser,
+  addProduct,
+  getDefaultProducts,
+  insertUserProducts,
+  getUserProducts,
+  updateUserProducts,
+  deleteUserProducts,
+  getUserInfo,
+  updateUserInfo,
+  allProducts,
+} from './projects/.admin/db.js';
 
 server.get('/.admin/users', async (req, res) => {
   try {
@@ -192,6 +176,37 @@ server.get('/.admin/all-products', async (req, res) => {
     res.json(product);
   } catch (error) {
     console.error('Error fetching product:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// --------------------------------------------------------
+
+// To-do 📝 ----------------------------------------------
+
+import { getTasks, newTask } from './projects/todo/db.js';
+
+server.get('/to-do/tasks', async (req, res) => {
+  try {
+    const tasks = await getTasks();
+    res.json(tasks);
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+server.post('/to-do/tasks/new', async (req, res) => {
+  try {
+    const id = await newTask(
+      req.body.taskName,
+      req.body.taskDescription,
+      req.body.taskDate,
+      req.body.taskUrgency
+    );
+    res.json({ id });
+  } catch (error) {
+    console.error('Error creating new task:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
